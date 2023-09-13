@@ -34,37 +34,44 @@ namespace veeb_back_end_.Controllers
             _httpClient = httpClient;
         }
 
-        [HttpGet("{country}")]
-        public async Task<IActionResult> GetNordPoolPrices(string country)
+        [HttpGet("{country}/{start}/{end}")]
+        public async Task<IActionResult> GetNordPoolPrices(
+            string country,
+            string start,
+            string end)
         {
-            var response = await _httpClient.GetAsync("https://dashboard.elering.ee/api/nps/price");
+            var response = await _httpClient.GetAsync(
+                $"https://dashboard.elering.ee/api/nps/price?start={start}&end={end}");
             var responseBody = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(responseBody);
+
             var jsonDoc = JsonDocument.Parse(responseBody);
             var dataProperty = jsonDoc.RootElement.GetProperty("data");
 
-            if (country == "ee")
+            string prices;
+
+            switch (country)
             {
-                var prices = dataProperty.GetProperty("ee").ToString();
-                return Content(prices, "application/json");
-            }
-            else if (country == "lv")
-            {
-                var prices = dataProperty.GetProperty("lv").ToString();
-                return Content(prices, "application/json");
-            }
-            else if (country == "lt")
-            {
-                var prices = dataProperty.GetProperty("lt").ToString();
-                return Content(prices, "application/json");
-            }
-            else if (country == "fi")
-            {
-                var prices = dataProperty.GetProperty("fi").ToString();
-                return Content(prices, "application/json");
-            }
-            else
-            {
-                return BadRequest("Invalid country code.");
+                case "ee":
+                    prices = dataProperty.GetProperty("ee").ToString();
+                    Console.WriteLine(responseBody);
+
+                    return Content(prices, "application/json");
+
+                case "lv":
+                    prices = dataProperty.GetProperty("lv").ToString();
+                    return Content(prices, "application/json");
+
+                case "lt":
+                    prices = dataProperty.GetProperty("lt").ToString();
+                    return Content(prices, "application/json");
+
+                case "fi":
+                    prices = dataProperty.GetProperty("fi").ToString();
+                    return Content(prices, "application/json");
+
+                default:
+                    return BadRequest("Invalid country code.");
             }
         }
     }
