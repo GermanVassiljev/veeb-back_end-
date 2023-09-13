@@ -136,21 +136,29 @@ namespace veeb_back_end_.Controllers
         }
 
         [HttpPost("Muudamine tooted")]
-        public ActionResult<List<Toode>> Muuda_toode(int id, [FromBody] Toode uueitem)
+        public ActionResult<List<Toode>> Muuda_toode([FromBody] Toode uueitem)
         {
-            var item = _tooted.;
+            var item = _tooted;
         
             if (item == null)
             {
                 return NotFound();
             }
-        
-            
-        
-            _context.Person.Update(person);
-            _context.SaveChanges();
-        
-            return Ok(_context.Person);
+            else
+            {
+                foreach (var item2 in _tooted)
+                {
+                    if (item2.Id==uueitem.Id)
+                    {
+                        item2.Name = uueitem.Name;
+                        item2.Price = uueitem.Price;
+                        item2.IsActive = uueitem.IsActive;
+                        return Ok(item2);
+                    }
+                }
+            }
+
+            return Ok(_tooted);
         }
 
 
